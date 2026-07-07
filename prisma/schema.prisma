@@ -1,0 +1,120 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ── PACKAGES ──────────────────────────────────────────────────────────────────
+model Package {
+  id             String   @id @default(uuid())
+  slug           String   @unique  // single, weekend, explorer, corporate
+  name           String
+  priceKES       Int
+  scans          Int      // -1 = unlimited
+  validityHours  Int
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  transactions   Transaction[]
+  credits        Credit[]
+}
+
+// ── TRANSACTIONS ──────────────────────────────────────────────────────────────
+model Transaction {
+  id               String   @id @default(uuid())
+  reference        String   @unique
+  deviceId         String
+  email            String?
+  phone            String?
+  amountKES        Int
+  currency         String   @default("KES")
+  amountLocal      Float
+  packageId        String
+  package          Package  @relation(fields: [packageId], references: [id])
+  affiliateCode    String?
+  affiliate        Affiliate? @relation(fields: [affiliateCode], references: [code])
+  paymentMethod    String   // paystack_card | mpesa | paystack_mobile
+  paymentStatus    String   @default("pending") // pending | success | failed | refunded
+  paystackRef      String?
+  mpesaReceiptNo   String?
+  checkoutRequestId String?
+  rawWebhookData   String?  // JSON string of webhook payload
+  commissionPaid   Boolean  @default(false)
+  commissionAmount Int?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  credit           Credit?
+}
+
+// ── CREDITS ───────────────────────────────────────────────────────────────────
+model Credit {
+  id            String    @id @default(uuid())
+  deviceId      String
+  packageId     String
+  package       Package   @relation(fields: [packageId], references: [id])
+  transactionId String    @unique
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  scansTotal    Int
+  scansUsed     Int       @default(0)
+  expiresAt     DateTime?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+// ── AFFILIATES ────────────────────────────────────────────────────────────────
+model Affiliate {
+  id             String    @id @default(uuid())
+  code           String    @unique
+  name           String
+  email          String    @unique
+  phone          String?
+  country        String?
+  payoutMethod   String    // mpesa | bank | paypal | paystack
+  payoutDetails  String    // JSON: { phone } or { accountNo, bank } or { email }
+  status         String    @default("pending") // pending | approved | suspended
+  commissionRate Float     @default(0.60)
+  totalEarned    Int       @default(0)  // KES, in cents
+  totalPaid      Int       @default(0)
+  pendingBalance Int       @default(0)
+  promoChannel   String?   // tiktok | instagram | youtube | etc
+  socialHandle   String?
+  notes          String?
+  approvedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  transactions   Transaction[]
+  payouts        AffiliatePayout[]
+}
+
+// ── AFFILIATE PAYOUTS ─────────────────────────────────────────────────────────
+model AffiliatePayout {
+  id            String    @id @default(uuid())
+  affiliateId   String
+  affiliate     Affiliate @relation(fields: [affiliateId], references: [id])
+  amountKES     Int
+  method        String
+  reference     String?
+  status        String    @default("pending") // pending | paid | failed
+  notes         String?
+  createdAt     DateTime  @default(now())
+  paidAt        DateTime?
+}
+
+// ── SCAN EVENTS (analytics) ───────────────────────────────────────────────────
+model ScanEvent {
+  id          String   @id @default(uuid())
+  deviceId    String
+  scanType    String   // rf | ir | wifi | magnetic | full
+  result      String   // safe | threat
+  alertCount  Int      @default(0)
+  countryCode String?
+  createdAt   DateTime @default(now())
+}
