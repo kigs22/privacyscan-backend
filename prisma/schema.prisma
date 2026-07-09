@@ -1,5 +1,3 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,53 +7,49 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ── PACKAGES ──────────────────────────────────────────────────────────────────
 model Package {
   id             String   @id @default(uuid())
-  slug           String   @unique  // single, weekend, explorer, corporate
+  slug           String   @unique
   name           String
   priceKES       Int
-  scans          Int      // -1 = unlimited
+  scans          Int
   validityHours  Int
   isActive       Boolean  @default(true)
   createdAt      DateTime @default(now())
-
   transactions   Transaction[]
   credits        Credit[]
 }
 
-// ── TRANSACTIONS ──────────────────────────────────────────────────────────────
 model Transaction {
-  id               String   @id @default(uuid())
-  reference        String   @unique
-  deviceId         String
-  email            String?
-  phone            String?
-  amountKES        Int
-  currency         String   @default("KES")
-  amountLocal      Float
-  packageId        String
-  package          Package  @relation(fields: [packageId], references: [id])
-  affiliateCode    String?
-  affiliate        Affiliate? @relation(fields: [affiliateCode], references: [code])
-  paymentMethod    String   // paystack_card | mpesa | paystack_mobile
-  paymentStatus    String   @default("pending") // pending | success | failed | refunded
-  paystackRef      String?
-  mpesaReceiptNo   String?
+  id                String    @id @default(uuid())
+  reference         String    @unique
+  deviceId          String
+  email             String?
+  phone             String?
+  amountKES         Int
+  currency          String    @default("KES")
+  amountLocal       Float
+  packageId         String
+  package           Package   @relation(fields: [packageId], references: [id])
+  affiliateCode     String?
+  affiliate         Affiliate? @relation(fields: [affiliateCode], references: [code])
+  paymentMethod     String
+  paymentStatus     String    @default("pending")
+  paystackRef       String?
+  mpesaReceiptNo    String?
   checkoutRequestId String?
-  rawWebhookData   String?  // JSON string of webhook payload
-  commissionPaid   Boolean  @default(false)
-  commissionAmount Int?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  credit           Credit?
+  rawWebhookData    String?
+  commissionPaid    Boolean   @default(false)
+  commissionAmount  Int?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  credit            Credit?
 }
 
-// ── CREDITS ───────────────────────────────────────────────────────────────────
 model Credit {
   id            String    @id @default(uuid())
   deviceId      String
+  userEmail     String?
   packageId     String
   package       Package   @relation(fields: [packageId], references: [id])
   transactionId String    @unique
@@ -68,7 +62,6 @@ model Credit {
   updatedAt     DateTime  @updatedAt
 }
 
-// ── AFFILIATES ────────────────────────────────────────────────────────────────
 model Affiliate {
   id             String    @id @default(uuid())
   code           String    @unique
@@ -76,25 +69,23 @@ model Affiliate {
   email          String    @unique
   phone          String?
   country        String?
-  payoutMethod   String    // mpesa | bank | paypal | paystack
-  payoutDetails  String    // JSON: { phone } or { accountNo, bank } or { email }
-  status         String    @default("pending") // pending | approved | suspended
+  payoutMethod   String
+  payoutDetails  String
+  status         String    @default("pending")
   commissionRate Float     @default(0.60)
-  totalEarned    Int       @default(0)  // KES, in cents
+  totalEarned    Int       @default(0)
   totalPaid      Int       @default(0)
   pendingBalance Int       @default(0)
-  promoChannel   String?   // tiktok | instagram | youtube | etc
+  promoChannel   String?
   socialHandle   String?
   notes          String?
   approvedAt     DateTime?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
-
   transactions   Transaction[]
   payouts        AffiliatePayout[]
 }
 
-// ── AFFILIATE PAYOUTS ─────────────────────────────────────────────────────────
 model AffiliatePayout {
   id            String    @id @default(uuid())
   affiliateId   String
@@ -102,18 +93,17 @@ model AffiliatePayout {
   amountKES     Int
   method        String
   reference     String?
-  status        String    @default("pending") // pending | paid | failed
+  status        String    @default("pending")
   notes         String?
   createdAt     DateTime  @default(now())
   paidAt        DateTime?
 }
 
-// ── SCAN EVENTS (analytics) ───────────────────────────────────────────────────
 model ScanEvent {
   id          String   @id @default(uuid())
   deviceId    String
-  scanType    String   // rf | ir | wifi | magnetic | full
-  result      String   // safe | threat
+  scanType    String
+  result      String
   alertCount  Int      @default(0)
   countryCode String?
   createdAt   DateTime @default(now())
@@ -123,7 +113,6 @@ model User {
   id            String    @id @default(uuid())
   email         String    @unique
   deviceId      String?
-  userEmail     String?
   isVerified    Boolean   @default(false)
   sessionToken  String?
   otp           String?
