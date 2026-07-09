@@ -4,28 +4,29 @@
   "description": "PrivacyScan API — Payments, Credits, Affiliates",
   "main": "src/index.js",
   "scripts": {
-    "start":       "node src/index.js",
-    "dev":         "nodemon src/index.js",
-    "db:migrate":  "npx prisma migrate dev",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "db:migrate": "npx prisma migrate dev",
     "db:generate": "npx prisma generate",
-    "db:studio":   "npx prisma studio",
-    "db:seed":     "node prisma/seed.js"
+    "db:studio": "npx prisma studio",
+    "db:seed": "node prisma/seed.js"
   },
   "dependencies": {
-    "express":          "^4.18.2",
-    "cors":             "^2.8.5",
-    "helmet":           "^7.1.0",
-    "morgan":           "^1.10.0",
-    "dotenv":           "^16.3.1",
-    "axios":            "^1.6.0",
-    "prisma":           "^5.7.0",
-    "@prisma/client":   "^5.7.0",
-    "uuid":             "^9.0.0",
-    "crypto":           "^1.0.1",
-    "express-rate-limit":"^7.1.5",
-    "express-validator":"^7.0.1",
-    "winston":          "^3.11.0",
-    "node-cron":        "^3.0.3"
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.0",
+    "prisma": "^5.7.0",
+    "@prisma/client": "^5.7.0",
+    "uuid": "^9.0.0",
+    "crypto": "^1.0.1",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "winston": "^3.11.0",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

@@ -53,7 +53,8 @@ app.use(`${BASE}/credits`,    require('./routes/credits'));
 app.use(`${BASE}/affiliates`, require('./routes/affiliates'));
 app.use(`${BASE}/packages`,   require('./routes/packages'));
 app.use(`${BASE}/scans`,      require('./routes/scans'));
-app.use(`${BASE}/admin`,      require('./routes/admin'));
+app.use(`${BASE}/auth`, require('./routes/auth'));
+app.use(`${BASE}/admin`, require('./routes/admin'));'));
 
 // ── 404 ────────────────────────────────────────────────────────────────────────
 app.use((req, res) => {

@@ -118,3 +118,18 @@ model ScanEvent {
   countryCode String?
   createdAt   DateTime @default(now())
 }
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  deviceId      String?
+  userEmail     String?
+  isVerified    Boolean   @default(false)
+  sessionToken  String?
+  otp           String?
+  otpExpiresAt  DateTime?
+  otpAttempts   Int       @default(0)
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
