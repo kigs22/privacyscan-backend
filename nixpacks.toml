@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["nodejs_18", "openssl"]
+
+[phases.install]
+cmds = ["npm i"]
+
+[phases.build]
+cmds = []
+
+[start]
+cmd = "node src/index.js"
