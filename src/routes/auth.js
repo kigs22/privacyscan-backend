@@ -19,7 +19,7 @@ const generateOTP = () =>
 // ── Send OTP Email ─────────────────────────────────────────────────────────
 const sendOTPEmail = async (email, otp) => {
   await resend.emails.send({
-    from:    `"PrivacyScan" <${process.env.GMAIL_USER}>`,
+    from: 'PrivacyScan <noreply@support.pesagate.com>',
     to:      email,
     subject: `Your PrivacyScan verification code: ${otp}`,
     html: `
