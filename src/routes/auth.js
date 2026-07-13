@@ -3,19 +3,14 @@ const router   = require('express').Router();
 const { PrismaClient } = require('@prisma/client');
 const prisma   = new PrismaClient();
 const crypto   = require('crypto');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
+const resend = new Resend(process.env.RESEND_API_KEY);
 const logger   = require('../utils/logger');
 
 const OTP_EXPIRY_MINUTES = 10;
 
 // ── Email transporter (Gmail) ──────────────────────────────────────────────
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
-});
+// Using Resend for email
 
 // ── Generate 6-digit OTP ───────────────────────────────────────────────────
 const generateOTP = () =>
@@ -23,7 +18,7 @@ const generateOTP = () =>
 
 // ── Send OTP Email ─────────────────────────────────────────────────────────
 const sendOTPEmail = async (email, otp) => {
-  await transporter.sendMail({
+  await resend.emails.send({
     from:    `"PrivacyScan" <${process.env.GMAIL_USER}>`,
     to:      email,
     subject: `Your PrivacyScan verification code: ${otp}`,
